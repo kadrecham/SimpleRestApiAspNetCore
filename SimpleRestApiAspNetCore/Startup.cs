@@ -5,6 +5,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SimpleRestApiAspNetCore.Models;
 using Microsoft.EntityFrameworkCore;
+using SimpleRestApiAspNetCore.Services;
+using System.Threading.Tasks;
+using Microsoft.Azure.Cosmos.Fluent;
+using Microsoft.Azure.Cosmos;
 
 namespace SimpleRestApiAspNetCore
 {
@@ -21,6 +25,7 @@ namespace SimpleRestApiAspNetCore
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<MessageContext>(opt => opt.UseInMemoryDatabase("MessageList"));
+            services.AddSingleton<ICosmosDbService>(InitializeCosmosClientInstanceAsync(Configuration.GetSection("CosmosDb")).GetAwaiter().GetResult());
             services.AddControllers();
         }
 
@@ -40,6 +45,22 @@ namespace SimpleRestApiAspNetCore
             {
                 endpoints.MapControllers();
             });
+        }
+
+        // Creates a Cosmos DB database and a container with the specified partition key "/id". 
+        private static async Task<CosmosDbService> InitializeCosmosClientInstanceAsync(IConfigurationSection configurationSection)
+        {
+            string databaseName = configurationSection.GetSection("DatabaseName").Value;
+            string containerName = configurationSection.GetSection("ContainerName").Value;
+            string account = configurationSection.GetSection("Account").Value;
+            string key = configurationSection.GetSection("Key").Value;
+            CosmosClientBuilder clientBuilder = new CosmosClientBuilder(account, key);
+            CosmosClient client = clientBuilder.WithConnectionModeDirect().Build();
+            CosmosDbService cosmosDbService = new CosmosDbService(client, databaseName, containerName);
+            DatabaseResponse database = await client.CreateDatabaseIfNotExistsAsync(databaseName);
+            await database.Database.CreateContainerIfNotExistsAsync(containerName, "/id");
+
+            return cosmosDbService;
         }
     }
 }
