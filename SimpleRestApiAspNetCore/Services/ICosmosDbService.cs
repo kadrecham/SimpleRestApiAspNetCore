@@ -6,7 +6,7 @@ namespace SimpleRestApiAspNetCore.Services
 {
     public interface ICosmosDbService
     {
-        Task<List<Message>> GetMessagesAsync(int start);
+        Task<List<Message>> GetMessagesAsync(int start, int maxCountReturnedRecords);
         Task AddMessageAsync(Message message);
     }
 }

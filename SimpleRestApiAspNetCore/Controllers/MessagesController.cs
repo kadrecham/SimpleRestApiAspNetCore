@@ -15,11 +15,13 @@ namespace SimpleRestApiAspNetCore.Controllers
     {
         private readonly MessageContext _context;
         private readonly ICosmosDbService _cosmosDbService;
+        private readonly int _maxCountReturnedRecords;
 
-        public MessagesController(MessageContext context, ICosmosDbService cosmosDbService)
+        public MessagesController(MessageContext context, ICosmosDbService cosmosDbService, string MAX_COUNT_RETURNED_RECORDS)
         {
             _context = context;
             _cosmosDbService = cosmosDbService;
+            _maxCountReturnedRecords = int.Parse(MAX_COUNT_RETURNED_RECORDS);
         }
 
 
@@ -27,14 +29,14 @@ namespace SimpleRestApiAspNetCore.Controllers
         [HttpGet("InMemory/{start:min(0)?}")]
         public async Task<ActionResult<IEnumerable<Message>>> GetMessagesFromMemoryAsync(int start)
         {
-            return await _context.Messages.Skip(start).Take(Constants.MAX_RETURNED_RECORDS).ToListAsync();
+            return await _context.Messages.Skip(start).Take(_maxCountReturnedRecords).ToListAsync();
         }
 
         // GET: api/Messages/DB/5
         [HttpGet("DB/{start:min(0)?}")]
         public async Task<ActionResult<IEnumerable<Message>>> GetMessagesFromDBAsync(int start)
         {
-            return await _cosmosDbService.GetMessagesAsync(start);
+            return await _cosmosDbService.GetMessagesAsync(start, _maxCountReturnedRecords);
         }
 
 

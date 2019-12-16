@@ -22,8 +22,9 @@ namespace SimpleRestApiAspNetCore.Services
         }
 
         //Return the range (start, count) of messages from the database container.
-        public async Task<List<Message>> GetMessagesAsync(int start)
+        public async Task<List<Message>> GetMessagesAsync(int start, int maxCountReturnedRecords)
         {
+            
             var query = "SELECT * FROM c";
             var queryResults = this._container.GetItemQueryIterator<Message>(new QueryDefinition(query));
             List<Message> results = new List<Message>();
@@ -32,7 +33,7 @@ namespace SimpleRestApiAspNetCore.Services
                 var response = await queryResults.ReadNextAsync();
                 results.AddRange(response.ToList());
             }
-            return results.Skip(start).Take(Constants.MAX_RETURNED_RECORDS).ToList();
+            return results.Skip(start).Take(maxCountReturnedRecords).ToList();
         }
     }
 }

@@ -26,6 +26,7 @@ namespace SimpleRestApiAspNetCore
         {
             services.AddDbContext<MessageContext>(opt => opt.UseInMemoryDatabase("MessageList"));
             services.AddSingleton<ICosmosDbService>(InitializeCosmosClientInstanceAsync(Configuration.GetSection("CosmosDb")).GetAwaiter().GetResult());
+            services.AddSingleton(Configuration.GetValue<string>("MAX_COUNT_RETURNED_RECORDS"));
             services.AddControllers();
         }
 
