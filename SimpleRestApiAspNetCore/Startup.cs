@@ -27,7 +27,7 @@ namespace SimpleRestApiAspNetCore
             services.AddDbContext<MessageContext>(opt => opt.UseInMemoryDatabase("MessageList"));
             services.AddSingleton<ICosmosDbService>(InitializeCosmosClientInstanceAsync(Configuration.GetSection("CosmosDb")).GetAwaiter().GetResult());
             services.AddSingleton(Configuration.GetValue<string>("MAX_COUNT_RETURNED_RECORDS"));
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson(); 
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
