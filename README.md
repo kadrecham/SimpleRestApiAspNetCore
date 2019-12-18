@@ -4,7 +4,7 @@ Receive a JSON object in Form:
     
 ```
 {
-	"id":"5",
+	"id":5,
 	"name":"kadrecham",
 	"text":"Hello world!",
 	"created":"2019-11-24T18:55:52.7174882+00:00"
